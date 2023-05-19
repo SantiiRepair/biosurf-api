@@ -37,14 +37,21 @@ contract BiosurfERC721 is ERC721 {
     bool public transferable;
     address public creator;
     uint256 public creationTime;
+    address public owner;
     
     constructor(string memory _name, string memory _symbol, address _creator) ERC721(_name, _symbol) {
         transferable = false;
         creator = _creator;
         creationTime = block.timestamp;
+        owner = msg.sender;
     }
     
-    function setTransferability(bool _transferable) public {
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not authorized");
+        _;
+    }
+    
+    function setTransferability(bool _transferable) public onlyOwner {
         transferable = _transferable;
     }
     
@@ -53,8 +60,9 @@ contract BiosurfERC721 is ERC721 {
         super.transferFrom(from, to, tokenId);
     }
     
-    function transferOwnership(address newOwner) public override onlyOwner {
+    function transferOwnership(address newOwner) public onlyOwner {
         require(block.timestamp >= creationTime + 4 years, "Ownership transfer not available yet");
+        owner = newOwner;
         super.transferOwnership(newOwner);
     }
     
