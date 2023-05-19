@@ -2,4 +2,4 @@ module gitlab.com/biosurf/biosurf-api
 
 go 1.20
 
-require github.com/gorilla/mux v1.8.0
+require golang.org/x/crypto v0.9.0

@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"database/sql"
+
 	db "gitlab.com/biosurf/biosurf-api/auth/db"
 )
 
@@ -24,4 +26,20 @@ func CreateUser(user *User) error {
 	user.ID = int(userID)
 
 	return nil
+}
+
+func GetUserByEmail(email string) (*User, error) {
+    db, err := db.Connect()
+    row := db.QueryRow("SELECT id, email, password FROM usuarios WHERE email = ?", email)
+
+    user := User{}
+    err = row.Scan(&user.ID, &user.Email, &user.Password)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return nil, ErrUserNotFound
+        }
+        return nil, err
+    }
+
+    return &user, nil
 }
