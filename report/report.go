@@ -4,7 +4,7 @@ import (
 	gin "github.com/gin-gonic/gin"
 )
 
-func Auth(r *gin.Engine) {
+func Report(r *gin.Engine) {
 	r.POST("/report", HandleReport)
 }
 
