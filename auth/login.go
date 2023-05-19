@@ -1,30 +1,30 @@
 package auth
 
 import (
-    "encoding/json"
+	gin "github.com/gin-gonic/gin"
 	bcrypt "golang.org/x/crypto/bcrypt"
-    "net/http"
+	"net/http"
 )
 
-func HandleLogin(w http.ResponseWriter, r *http.Request) {
-    var data LoginData
-    err := json.NewDecoder(r.Body).Decode(&data)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
+func HandleLogin(c *gin.Context) {
+	var data LoginData
+	err := c.BindJSON(&data)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
 
-    user, err := GetUserByEmail(data.Email)
-    if err != nil {
-        http.Error(w, "User not found", http.StatusUnauthorized)
-        return
-    }
+	user, err := GetUserByEmail(data.Email)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"Error": "User not found"})
+		return
+	}
 
-    err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password))
-    if err != nil {
-        http.Error(w, "Incorrect password", http.StatusUnauthorized)
-        return
-    }
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"Error": "Incorrect password"})
+		return
+	}
 
-    json.NewEncoder(w).Encode(user)
+	c.JSON(http.StatusOK, user)
 }

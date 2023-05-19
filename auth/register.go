@@ -1,22 +1,22 @@
 package auth
 
 import (
-	"encoding/json"
+	gin "github.com/gin-gonic/gin"
 	bcrypt "golang.org/x/crypto/bcrypt"
 	"net/http"
 )
 
-func HandleRegister(w http.ResponseWriter, r *http.Request) {
-	var data RegisterData
-	err := json.NewDecoder(r.Body).Decode(&data)
+func HandleRegister(c *gin.Context) {
+    var data RegisterData
+	err := c.BindJSON(&data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -26,9 +26,9 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 	err = CreateUser(&user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	json.NewEncoder(w).Encode(user)
+	c.JSON(http.StatusOK, user)
 }
