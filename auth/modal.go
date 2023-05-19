@@ -5,6 +5,7 @@ import (
 )
 
 func CreateUser(user *User) error {
+    db, err := db.Connect()
 	statement, err := db.Prepare("INSERT INTO usuarios (email, password) VALUES (?, ?)")
 	if err != nil {
 		return err

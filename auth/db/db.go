@@ -2,10 +2,14 @@ package db
 
 import (
     "database/sql"
+    "fmt"
 )
 
-db, err := sql.Open("mysql", "usuario:contraseña@tcp(direccion:puerto)/nombre_de_la_base_de_datos")
-if err != nil {
-        return err
+func Connect() (*sql.DB, error) {
+    db, err := sql.Open("mysql", "usuario:contraseña@tcp(direccion:puerto)/nombre_de_la_base_de_datos")
+    if err != nil {
+        return nil, fmt.Errorf("Error conectando a la base de datos: %s", err.Error())
     }
-    defer db.Close()
+
+    return db, nil
+}
