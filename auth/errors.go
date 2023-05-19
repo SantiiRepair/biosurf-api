@@ -2,4 +2,4 @@ package auth
 
 import "errors"
 
-var ErrUserNotFound = errors.New("usuario no encontrado")
+var ErrUserNotFound = errors.New("User not found")
