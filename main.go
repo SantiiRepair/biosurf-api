@@ -8,7 +8,7 @@ import (
 func main() {
 	r := gin.Default()
 
-	auth.Routes(r)
+	auth.Auth(r)
 
 	r.Run(":8080")
 }
