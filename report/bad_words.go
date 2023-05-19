@@ -1,3 +1,3 @@
 package report
 
-var wordsList = []string{"gillipollas", "joputa", "cabron"}
+var wordsList = []string{"puta", "coño", "joder", "cabrón", "maricón", "gilipollas", "hijo de puta", "zorra", "mierda"}
