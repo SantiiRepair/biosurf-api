@@ -1,15 +1,17 @@
 package auth
 
 import (
-	mux "github.com/gorilla/mux"
-	"net/http"
+	gin"github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := mux.NewRouter()
+	r := gin.Default()
 
-	r.HandleFunc("/register", HandleRegister).Methods("POST")
-	r.HandleFunc("/login", HandleLogin).Methods("POST")
+	r.POST("/register", HandleRegister)
+	r.POST("/login", HandleLogin)
 
-	http.ListenAndServe(":8080", r)
+	err := r.Run(":8080")
+	if err != nil {
+		panic(err)
+	}
 }
