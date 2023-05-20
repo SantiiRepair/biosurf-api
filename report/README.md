@@ -5,23 +5,40 @@ This is a simple service that checks if a given text contains any obscene words.
 
 ### Usage
 
-To check if a given text contains any obscene words, send a POST request to the `/report` endpoint with the text parameter in the request body. Here's an example using the `curl` command:
+To check if a given text contains any obscene words, send a POST request to the `/report` endpoint with the text parameter in the request body. Here's an example using the `typescript` command:
 
 ```typescript
-const checkText = async (text) => {
+import axios from 'axios'
+
+interface Response {
+  message: string
+  obscene: boolean
+}
+
+const message = async (text: string): Promise<void> => {
   try {
-    const res = await axios.post('http://localhost:8080/report', {text})
-    if (res.data.response.obscene) {
-      console.log(res.data.response.message)
-	  // The text contains an obscene word
+    const res = await axios.post<Response>('http://localhost:8080/report', { text }) 
+    if (res.data.obscene) {
+      console.log(res.data.message)
     } else {
-      console.log(res.data.response.message)
-	  // The text does not contain obscene words
+      console.log(res.data.message)
     }
   } catch (error) {
     console.error(error)
   }
 }
+```
+
+- Response
+
+```typescript
+await message('Este tio es un gilipollas') 
+// Output: The text contains an obscene word
+
+Or
+
+await message('Este tio es mi amigo') 
+// Output: The text does not contain obscene words
 ```
 
 This will return a JSON response indicating whether or not the text contains any obscene words:
