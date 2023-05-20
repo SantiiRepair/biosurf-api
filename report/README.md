@@ -25,9 +25,9 @@ If the text does not contain any obscene words, the response will look like this
 
 ### Customization
 
-If you want to customize the list of obscene words that the service checks for, you can update the `wordsList` variable in the `main.go` file. 
+If you want to customize the list of obscene words that the service checks for, you can update the `wordsList` variable in the `bad_words.go` file. 
 
-```
+```go
 var wordsList = []string{
 	"puta",
 	"coño",
