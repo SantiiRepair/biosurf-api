@@ -14,5 +14,5 @@ func main() {
 	auth.Auth(r)
 	report.Report(r)
 
-	r.Run(os.Getenv("PORT"))
+	r.Run(":" + os.Getenv("PORT"))
 }
