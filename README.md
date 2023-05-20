@@ -1,6 +1,4 @@
-Sure, I'd be happy to help you create a README.md file that explains how your code works and how to use it. Here's an example README.md file that you can customize for your own project:
-
-### Obscenity Checker
+### Report
 
 This is a simple web service that checks if a given text contains any obscene words. It's built with Go and uses the Gin web framework.
 
