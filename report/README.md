@@ -36,7 +36,7 @@ await message('Este tio es un gilipollas')
 // Output: The text contains an obscene word
 ```
 
-Or
+- Or
 
 ```typescript
 await message('Este tio es mi amigo') 
