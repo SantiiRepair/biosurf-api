@@ -3,7 +3,7 @@ package auth
 import (
 	"database/sql"
 
-	db "github.com/SantiiRepair/biosurf-api/auth/db"
+	db "github.com/SantiiRepair/biosurf-api/db"
 )
 
 func CreateUser(user *User) error {
