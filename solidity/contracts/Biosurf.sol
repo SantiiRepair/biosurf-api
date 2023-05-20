@@ -4,36 +4,47 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
+interface IOwnable {
+    function transferOwnership(address newOwner) external;
+}
+
 contract ERC721Proxy {
     address public implementation;
+    address public owner;
     mapping(address => mapping(address => bool)) public authorized;
     
     constructor(address _implementation) {
         implementation = _implementation;
+        owner = msg.sender;
     }
     
-    function createNewERC721(string memory _name, string memory _symbol, address _creator) public returns (address) {
-        ERC721 newContract = new BiosurfERC721(_name, _symbol, _creator);
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not authorized");
+        _;
+    }
+    
+    function createNewERC721(string memory _name, string memory _symbol, address _creator) public onlyOwner returns (address) {
+        BiosurfERC721 newContract = new BiosurfERC721(_name, _symbol, _creator);
         newContract.setTransferability(false);
         authorized[_creator][address(newContract)] = true;
         return address(newContract);
     }
     
-    function upgradeImplementation(address _newImplementation) public {
+    function upgradeImplementation(address _newImplementation) public onlyOwner {
         implementation = _newImplementation;
     }
     
-    function transferOwnership(address _contractAddress) public {
+    function transferOwnership(address _contractAddress) public onlyOwner {
         require(authorized[msg.sender][_contractAddress], "Not authorized");
         BiosurfERC721 erc721Contract = BiosurfERC721(_contractAddress);
-        require(erc721Contract.creationTime() + 4 years <= block.timestamp, "Not eligible for ownership transfer yet");
+        require(erc721Contract.creationTime() + 4 * 365 days <= block.timestamp, "Not eligible for ownership transfer yet");
         erc721Contract.transferOwnership(msg.sender);
         authorized[msg.sender][_contractAddress] = false;
         erc721Contract.setTransferability(true);
     }
 }
 
-contract BiosurfERC721 is ERC721 {
+contract BiosurfERC721 is ERC721, IOwnable {
     bool public transferable;
     address public creator;
     uint256 public creationTime;
@@ -54,17 +65,17 @@ contract BiosurfERC721 is ERC721 {
     function setTransferability(bool _transferable) public onlyOwner {
         transferable = _transferable;
     }
-    
+
     function transferFrom(address from, address to, uint256 tokenId) public override {
         require(transferable, "Token transfer not allowed");
         super.transferFrom(from, to, tokenId);
     }
     
-    function transferOwnership(address newOwner) public onlyOwner {
-        require(block.timestamp >= creationTime + 4 years, "Ownership transfer not available yet");
-        owner = newOwner;
-        super.transferOwnership(newOwner);
-    }
+function transferOwnership(address to) public onlyOwner {
+    require(block.timestamp >= creationTime + 4 * 365 days, "Ownership transfer not available yet");
+    owner = to;
+    IOwnable(to).transferOwnership(to);
+}
     
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override {
         if (Address.isContract(to)) {
@@ -89,6 +100,3 @@ contract BiosurfERC721 is ERC721 {
     }
 }
 
-interface IOwnable {
-    function transferOwnership(address newOwner) external;
-}
