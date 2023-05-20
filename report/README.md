@@ -14,13 +14,23 @@ curl -X POST -d "text=puta" http://localhost:8080/report
 This will return a JSON response indicating whether or not the text contains any obscene words:
 
 ```
-{"message":"The text contains an obscene word"}
+{
+  "response": {
+    "message": "The text contains an obscene word",
+    "obscene": true
+  }
+}
 ```
 
 If the text does not contain any obscene words, the response will look like this:
 
 ```
-{"message":"The text does not contain obscene words"}
+{
+  "response": {
+    "message": "The text does not contain obscene words",
+    "obscene": false
+  }
+}
 ```
 
 ### Customization
