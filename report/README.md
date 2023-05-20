@@ -7,8 +7,21 @@ This is a simple service that checks if a given text contains any obscene words.
 
 To check if a given text contains any obscene words, send a POST request to the `/report` endpoint with the text parameter in the request body. Here's an example using the `curl` command:
 
-```
-curl -X POST -d "text=puta" http://localhost:8080/report
+```typescript
+const checkText = async (text) => {
+  try {
+    const res = await axios.post('http://localhost:8080/report', {text})
+    if (res.data.response.obscene) {
+      console.log(res.data.response.message)
+	  // The text contains an obscene word
+    } else {
+      console.log(res.data.response.message)
+	  // The text does not contain obscene words
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
 ```
 
 This will return a JSON response indicating whether or not the text contains any obscene words:
