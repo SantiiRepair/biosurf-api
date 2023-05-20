@@ -1,6 +1,6 @@
-### Report
+## Report
 
-This is a simple web service that checks if a given text contains any obscene words. It's built with Go and uses the Gin web framework.
+This is a simple service that checks if a given text contains any obscene words. It's built with Go and uses the Gin framework.
 
 
 ### Usage
