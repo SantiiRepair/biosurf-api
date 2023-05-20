@@ -69,20 +69,6 @@ If the text does not contain any obscene words, the response will look like this
 
 If you want to customize the list of obscene words that the service checks for, you can update the `wordsList` variable in the `bad_words.go` file. 
 
-```go
-var wordsList = []string{
-	"puta",
-	"coño",
-	"joder",
-	"cabrón",
-	"maricón",
-	"gilipollas",
-	"hijo de puta",
-	"zorra",
-	"mierda",
-}
-```
-
 ### Contributing
 
 If you find any issues or have suggestions for improvements, feel free to open an issue or a pull request on GitHub. 
