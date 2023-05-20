@@ -19,7 +19,8 @@ This will return a JSON response indicating whether or not the text contains any
 
 If the text does not contain any obscene words, the response will look like this:
 
-``{"message":"The text does not contain obscene words"}
+```
+{"message":"The text does not contain obscene words"}
 ```
 
 ### Customization
