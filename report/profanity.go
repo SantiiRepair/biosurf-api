@@ -7,9 +7,9 @@ import (
 )
 
 func HandleReport(c *gin.Context) {
-	texto := c.PostForm("texto")
+	text := c.PostForm("text")
 
-	if isProfanity(texto) {
+	if isProfanity(text) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "The text contains an obscene word"})
 		return
 	}

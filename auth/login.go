@@ -10,19 +10,19 @@ func HandleLogin(c *gin.Context) {
 	var data LoginData
 	err := c.BindJSON(&data)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	user, err := GetUserByEmail(data.Email)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"Error": "User not found"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"Error": "Incorrect password"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Incorrect password"})
 		return
 	}
 
