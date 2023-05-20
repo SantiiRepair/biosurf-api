@@ -26,7 +26,7 @@ const checkText = async (text) => {
 
 This will return a JSON response indicating whether or not the text contains any obscene words:
 
-```
+```json
 {
   "response": {
     "message": "The text contains an obscene word",
@@ -37,7 +37,7 @@ This will return a JSON response indicating whether or not the text contains any
 
 If the text does not contain any obscene words, the response will look like this:
 
-```
+```json
 {
   "response": {
     "message": "The text does not contain obscene words",
