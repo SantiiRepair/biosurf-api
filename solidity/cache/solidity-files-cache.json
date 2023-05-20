@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/workspace/solidity/contracts/Biosurf.sol": {
-      "lastModificationDate": 1684543211132,
-      "contentHash": "505539a13d2007759257d288f38762cf",
+      "lastModificationDate": 1684543649171,
+      "contentHash": "ad850894b87a9850c71949f2610d212b",
       "sourceName": "contracts/Biosurf.sol",
       "solcConfig": {
         "version": "0.8.18",
