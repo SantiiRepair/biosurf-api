@@ -1,7 +1,7 @@
 package main
 
 import (
-	"os"
+	// // "os"
 
 	"github.com/SantiiRepair/biosurf-api/auth"
 	"github.com/SantiiRepair/biosurf-api/report"
@@ -14,5 +14,6 @@ func main() {
 	auth.Auth(r)
 	report.Report(r)
 
-	r.Run(":" + os.Getenv("PORT"))
+	// // r.Run(":" + os.Getenv("PORT"))
+	r.Run(":7070")
 }
