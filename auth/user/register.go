@@ -1,4 +1,4 @@
-package auth
+package user
 
 import (
 	gin "github.com/gin-gonic/gin"
