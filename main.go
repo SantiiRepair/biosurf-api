@@ -25,7 +25,8 @@ func main() {
 	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
 	config.AllowHeaders = []string{"Authorization", "Content-Type"}
 
-	r := gin.Default()
+	gin.SetMode(gin.DebugMode)
+	r := gin.New()
 	r.Use(cors.New(config), sessions.Sessions("session", store))
 
 	user.Auth(r)
