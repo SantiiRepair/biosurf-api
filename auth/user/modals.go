@@ -15,13 +15,13 @@ func CreateUser(user *User) error {
 	}
 	defer db.Close()
 
-	statement, err := db.Prepare("INSERT INTO users (name, lastname, email, password) VALUES (?,?,?,?)")
+	statement, err := db.Prepare("INSERT INTO users (name, lastname, email, password, created_at, updated_at) VALUES (?,?,?,?,?,?)")
 	if err != nil {
 		return fmt.Errorf("Failed to prepare statement: %v", err)
 	}
 	defer statement.Close()
 
-	result, err := statement.Exec(user.Name, user.LastName, user.Email, user.Password)
+	result, err := statement.Exec(user.Name, user.LastName, user.Email, user.Password, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		if strings.Contains(err.Error(), "Duplicate entry") {
 			return fmt.Errorf("Email already in use")
