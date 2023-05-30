@@ -1,6 +1,9 @@
 package user
 
 import (
+	"database/sql"
+	"fmt"
+
 	db "github.com/SantiiRepair/biosurf-api/db"
 )
 
@@ -28,12 +31,16 @@ func CreateUser(user *User) error {
 
 func GetUserByEmail(email string) (*User, error) {
 	db, err := db.Connect()
-	
+	if err != nil {
+		panic(err)
+	}
 	var user User
-	w := db.QueryRow("SELECT id, email, password, created_at, updated_at FROM users WHERE email=?", email)
-	error := w.Scan(&user.ID, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt)
-	if error != nil {
-		return nil, err
+	w := db.QueryRow("SELECT id, email, password FROM users WHERE email = $1", email).Scan(&user.ID, &user.Email, &user.Password)
+	if w != nil {
+		if w == sql.ErrNoRows {
+			return nil, fmt.Errorf("User with email %s not found", email)
+		}
+		return nil, w
 	}
 	return &user, nil
 }
