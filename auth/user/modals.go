@@ -3,44 +3,53 @@ package user
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	db "github.com/SantiiRepair/biosurf-api/db"
 )
 
 func CreateUser(user *User) error {
-	db, err := db.Connect()
-	statement, err := db.Prepare("INSERT INTO usuarios (email, password) VALUES (?, ?)")
+	db, error := db.Connect()
+	if error != nil {
+		return error
+	}
+	defer db.Close()
+
+	statement, err := db.Prepare("INSERT INTO users (name, lastname, email, password) VALUES (?,?,?,?)")
 	if err != nil {
-		return err
+		return fmt.Errorf("Failed to prepare statement: %v", err)
 	}
 	defer statement.Close()
 
-	result, err := statement.Exec(user.Email, user.Password)
+	result, err := statement.Exec(user.Name, user.LastName, user.Email, user.Password)
 	if err != nil {
-		return err
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			return fmt.Errorf("Email already in use")
+		}
+		return fmt.Errorf("Failed to execute statement: %v", err)
 	}
 
-	userID, err := result.LastInsertId()
+	_, err = result.LastInsertId()
 	if err != nil {
-		return err
+		return fmt.Errorf("Failed to get last insert ID: %v", err)
 	}
-	user.ID = int64(userID)
 
 	return nil
 }
 
 func GetUserByEmail(email string) (*User, error) {
-	db, err := db.Connect()
-	if err != nil {
-		panic(err)
+	db, error := db.Connect()
+	if error != nil {
+		panic(error)
 	}
+	defer db.Close()
 	var user User
-	w := db.QueryRow("SELECT id, email, password FROM users WHERE email = $1", email).Scan(&user.ID, &user.Email, &user.Password)
-	if w != nil {
-		if w == sql.ErrNoRows {
+	query := db.QueryRow("SELECT id, email, password FROM users WHERE email = $1", email).Scan(&user.ID, &user.Email, &user.Password)
+	if query != nil {
+		if query == sql.ErrNoRows {
 			return nil, fmt.Errorf("User with email %s not found", email)
 		}
-		return nil, w
+		return nil, query
 	}
 	return &user, nil
 }
