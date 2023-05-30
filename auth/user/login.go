@@ -21,8 +21,8 @@ func HandleLogin(c *gin.Context) {
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password))
-	if err != nil {
+	hashed := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password))
+	if hashed != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
 		return
 	}
