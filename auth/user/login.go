@@ -1,10 +1,12 @@
 package user
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/gin-contrib/sessions"
 	gin "github.com/gin-gonic/gin"
 	bcrypt "golang.org/x/crypto/bcrypt"
-	"net/http"
 )
 
 func HandleLogin(c *gin.Context) {
