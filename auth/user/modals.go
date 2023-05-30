@@ -45,11 +45,8 @@ func GetUserByEmail(email string) (*User, error) {
 	defer db.Close()
 	var user User
 	query := db.QueryRow("SELECT id, email, password FROM users WHERE email = $1", email).Scan(&user.ID, &user.Email, &user.Password)
-	if query != nil {
-		if query == sql.ErrNoRows {
-			return nil, fmt.Errorf("User with email %s not found", email)
-		}
-		return nil, query
+	if query == sql.ErrNoRows {
+		return nil, fmt.Errorf("User with email %s not found", email)
 	}
 	return &user, nil
 }
