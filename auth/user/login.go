@@ -17,13 +17,13 @@ func HandleLogin(c *gin.Context) {
 
 	user, err := GetUserByEmail(data.Email)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid email"})
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
 		return
 	}
 
