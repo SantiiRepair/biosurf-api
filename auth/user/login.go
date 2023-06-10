@@ -10,7 +10,6 @@ import (
 )
 
 func HandleLogin(c *fiber.Ctx) {
-	db, error := db.Connect()
 	var data LoginData
 	err := c.BodyParser(&data)
 	if err != nil {
@@ -21,10 +20,10 @@ func HandleLogin(c *fiber.Ctx) {
 		return
 	}
 
-	var user User
-	db.Where("email = ?", user.Email).First(&user)
+	var users User
+	db.DB.Where("email = ?", users.Email).First(&users)
 
-	if user.ID == 0 {
+	if users.ID == 0 {
 		c.Status(fiber.StatusNotFound)
 		c.JSON(fiber.Map{
 			"message": "Email not found",
@@ -33,7 +32,8 @@ func HandleLogin(c *fiber.Ctx) {
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data.Password)); err != nil {
+	hashed := bcrypt.CompareHashAndPassword([]byte(users.Password), []byte(data.Password))
+	if hashed != nil {
 		c.Status(fiber.StatusBadRequest)
 		c.JSON(
 			fiber.Map{
@@ -45,7 +45,7 @@ func HandleLogin(c *fiber.Ctx) {
 	}
 
 	clams := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(user.ID)),
+		Issuer:    strconv.Itoa(int(users.ID)),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	})
 

@@ -1,32 +1,30 @@
 package user
 
 import (
-	"net/http"
-	"strings"
 	"time"
 
-	gin "github.com/gin-gonic/gin"
+	db "github.com/SantiiRepair/biosurf-api/db"
+	fiber "github.com/gofiber/fiber"
 	bcrypt "golang.org/x/crypto/bcrypt"
 )
 
-func HandleRegister(c *gin.Context) {
+func HandleRegister(c *fiber.Ctx) {
 	var data RegisterData
-
-	if err := c.ShouldBindJSON(&data); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
-		return
-	}
-
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
+	err := c.BodyParser(&data)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.Status(fiber.StatusInternalServerError)
+		c.JSON(fiber.Map{
+			"message": "Could not register",
+		})
 		return
 	}
+
+	passwordHash, _ := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
 
 	loc, err := time.LoadLocation("Europe/Madrid")
 	date := time.Now().In(loc)
 
-	user := &User{
+	users := &User{
 		Name:      data.Name,
 		LastName:  data.LastName,
 		Email:     data.Email,
@@ -35,14 +33,9 @@ func HandleRegister(c *gin.Context) {
 		UpdatedAt: date,
 	}
 
-	if err := CreateUser(user); err != nil {
-		if strings.Contains(err.Error(), "Email already in use") {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Email already in use"})
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
-		}
-		return
-	}
+	db.DB.Create(&users)
 
-	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
+	c.JSON(data)
+
+	return
 }
