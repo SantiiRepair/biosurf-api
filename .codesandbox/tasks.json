@@ -7,7 +7,10 @@
     "go run": {
       "name": "Run",
       "command": "go run main.go",
-      "runAtStart": true
+      "runAtStart": true,
+      "preview": {
+        "port": 8080
+      }
     }
   }
 }
