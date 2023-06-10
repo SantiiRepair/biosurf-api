@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func HandleLogin(c *fiber.Ctx) error{
+func HandleLogin(c *fiber.Ctx) error {
 	var data LoginData
 	err := c.BodyParser(&data)
 	if err != nil {
@@ -61,7 +61,7 @@ func HandleLogin(c *fiber.Ctx) error{
 	}
 
 	c.Cookie(&cookie)
-
+	c.Status(fiber.StatusAccepted)
 	c.JSON(fiber.Map{
 		"message": "success",
 	})
