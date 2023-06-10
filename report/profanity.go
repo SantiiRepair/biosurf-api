@@ -1,10 +1,10 @@
 package report
 
 import (
-	fiber "github.com/gofiber/fiber"
+	fiber "github.com/gofiber/fiber/v2"
 )
 
-func HandleReport(c *fiber.Ctx) {
+func HandleReport(c *fiber.Ctx)error {
 	text := c.FormValue("text")
 
 	response := fiber.Map{
@@ -17,9 +17,10 @@ func HandleReport(c *fiber.Ctx) {
 		response["obscene"] = true
 
 		c.Status(fiber.StatusAccepted)
-		c.JSON(fiber.Map{"response": response})
-		return
+		c.JSON(fiber.Map{"response": response})	
 	}
 	c.Status(fiber.StatusAccepted)
 	c.JSON(fiber.Map{"response": response})
+	
+	return nil
 }

@@ -3,13 +3,13 @@ package user
 import (
 	db "github.com/SantiiRepair/biosurf-api/db"
 	"github.com/dgrijalva/jwt-go"
-	fiber "github.com/gofiber/fiber"
+	fiber "github.com/gofiber/fiber/v2"
 	bcrypt "golang.org/x/crypto/bcrypt"
 	"strconv"
 	"time"
 )
 
-func HandleLogin(c *fiber.Ctx) {
+func HandleLogin(c *fiber.Ctx) error{
 	var data LoginData
 	err := c.BodyParser(&data)
 	if err != nil {
@@ -17,7 +17,6 @@ func HandleLogin(c *fiber.Ctx) {
 		c.JSON(fiber.Map{
 			"message": "Could not login",
 		})
-		return
 	}
 
 	var users User
@@ -28,8 +27,6 @@ func HandleLogin(c *fiber.Ctx) {
 		c.JSON(fiber.Map{
 			"message": "Email not found",
 		})
-
-		return
 	}
 
 	hashed := bcrypt.CompareHashAndPassword([]byte(users.Password), []byte(data.Password))
@@ -40,8 +37,6 @@ func HandleLogin(c *fiber.Ctx) {
 				"message": "Incorrect password",
 			},
 		)
-
-		return
 	}
 
 	clams := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
@@ -56,8 +51,6 @@ func HandleLogin(c *fiber.Ctx) {
 		c.JSON(fiber.Map{
 			"message": "Could not login",
 		})
-
-		return
 	}
 
 	cookie := fiber.Cookie{
@@ -73,5 +66,5 @@ func HandleLogin(c *fiber.Ctx) {
 		"message": "success",
 	})
 
-	return
+	return err
 }

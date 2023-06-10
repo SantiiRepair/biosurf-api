@@ -4,11 +4,11 @@ import (
 	"time"
 
 	db "github.com/SantiiRepair/biosurf-api/db"
-	fiber "github.com/gofiber/fiber"
+	fiber "github.com/gofiber/fiber/v2"
 	bcrypt "golang.org/x/crypto/bcrypt"
 )
 
-func HandleRegister(c *fiber.Ctx) {
+func HandleRegister(c *fiber.Ctx) error {
 	var data RegisterData
 	err := c.BodyParser(&data)
 	if err != nil {
@@ -16,7 +16,6 @@ func HandleRegister(c *fiber.Ctx) {
 		c.JSON(fiber.Map{
 			"message": "Could not register",
 		})
-		return
 	}
 
 	passwordHash, _ := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
@@ -37,5 +36,5 @@ func HandleRegister(c *fiber.Ctx) {
 
 	c.JSON(data)
 
-	return
+	return err
 }

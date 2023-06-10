@@ -1,7 +1,7 @@
 package user
 
 import (
-	fiber "github.com/gofiber/fiber"
+	fiber "github.com/gofiber/fiber/v2"
 )
 
 const SecretKey = "secret"
