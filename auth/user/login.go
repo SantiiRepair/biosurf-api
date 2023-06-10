@@ -1,36 +1,77 @@
 package user
 
 import (
-	"net/http"
-
-	"github.com/gin-contrib/sessions"
-	gin "github.com/gin-gonic/gin"
+	db "github.com/SantiiRepair/biosurf-api/db"
+	"github.com/dgrijalva/jwt-go"
+	fiber "github.com/gofiber/fiber"
 	bcrypt "golang.org/x/crypto/bcrypt"
+	"strconv"
+	"time"
 )
 
-func HandleLogin(c *gin.Context) {
+func HandleLogin(c *fiber.Ctx) {
+	db, error := db.Connect()
 	var data LoginData
-	err := c.BindJSON(&data)
+	err := c.BodyParser(&data)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Status(fiber.StatusInternalServerError)
+		c.JSON(fiber.Map{
+			"message": "Could not login",
+		})
 		return
 	}
 
-	user, err := GetUserByEmail(data.Email)
+	var user User
+	db.Where("email = ?", user.Email).First(&user)
+
+	if user.ID == 0 {
+		c.Status(fiber.StatusNotFound)
+		c.JSON(fiber.Map{
+			"message": "Email not found",
+		})
+
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data.Password)); err != nil {
+		c.Status(fiber.StatusBadRequest)
+		c.JSON(
+			fiber.Map{
+				"message": "Incorrect password",
+			},
+		)
+
+		return
+	}
+
+	clams := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Issuer:    strconv.Itoa(int(user.ID)),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	token, err := clams.SignedString([]byte(SecretKey))
+
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid email"})
+		c.Status(fiber.StatusInternalServerError)
+		c.JSON(fiber.Map{
+			"message": "Could not login",
+		})
+
 		return
 	}
 
-	hashed := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password))
-	if hashed != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
-		return
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HTTPOnly: true,
 	}
 
-	session := sessions.Default(c)
-	session.Set("userID", user.ID)
-	session.Save()
+	c.Cookie(&cookie)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
+	c.JSON(fiber.Map{
+		"message": "success",
+	})
+
+	return
 }

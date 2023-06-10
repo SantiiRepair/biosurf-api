@@ -1,10 +1,13 @@
 package user
 
 import (
-	gin "github.com/gin-gonic/gin"
+	fiber "github.com/gofiber/fiber"
 )
 
-func Auth(r *gin.Engine) {
-	r.POST("/register", HandleRegister)
-	r.POST("/login", HandleLogin)
+const SecretKey = "secret"
+
+func Auth(r *fiber.App) {
+	r.Post("/user/register", HandleRegister)
+	r.Post("/user/login", HandleLogin)
+	r.Post("/user/logout", HandleLogout)
 }
