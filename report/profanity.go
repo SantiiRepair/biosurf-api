@@ -1,16 +1,13 @@
 package report
 
 import (
-	"net/http"
-
-	gin "github.com/gin-gonic/gin"
+	fiber "github.com/gofiber/fiber"
 )
 
-func HandleReport(c *gin.Context) {
-	text := c.PostForm("text")
-	// id := c.PostForm("id")
+func HandleReport(c *fiber.Ctx) {
+	text := c.FormValue("text")
 
-	response := gin.H{
+	response := fiber.Map{
 		"message": "The text does not contain obscene words",
 		"obscene": false,
 	}
@@ -18,9 +15,11 @@ func HandleReport(c *gin.Context) {
 	if isProfanity(text) {
 		response["message"] = "The text contains an obscene word"
 		response["obscene"] = true
-		c.JSON(http.StatusBadRequest, gin.H{"response": response})
+
+		c.Status(fiber.StatusAccepted)
+		c.JSON(fiber.Map{"response": response})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{"response": response})
+	c.Status(fiber.StatusAccepted)
+	c.JSON(fiber.Map{"response": response})
 }

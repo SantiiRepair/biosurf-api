@@ -1,37 +1,27 @@
 package main
 
 import (
-	// "os"
 	"github.com/SantiiRepair/biosurf-api/auth/user"
 	"github.com/SantiiRepair/biosurf-api/db"
 	"github.com/SantiiRepair/biosurf-api/report"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
-	gin "github.com/gin-gonic/gin"
+	fiber "github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
-	db, err := db.Connect()
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	app := fiber.New()
+	db.Connect()
+	
 
-	store := cookie.NewStore([]byte("secret"))
+	app.Use(cors.New(cors.Config{
+        AllowHeaders:     "Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,Connection,Access-Control-Allow-Origin",
+        AllowOrigins:     "*",
+        AllowCredentials: true,
+        AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
+    })) 
 
-	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
-	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
-	config.AllowHeaders = []string{"Authorization", "Content-Type"}
+	user.Auth(app)
+	report.Report(app)
 
-	gin.SetMode(gin.DebugMode)
-	r := gin.New()
-	r.Use(cors.New(config), sessions.Sessions("session", store))
-
-	user.Auth(r)
-	report.Report(r)
-
-	// // r.Run(":" + os.Getenv("PORT"))
-	r.Run(":7070")
+	app.Listen(":8080")
 }

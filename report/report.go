@@ -1,10 +1,9 @@
 package report
 
 import (
-	gin "github.com/gin-gonic/gin"
+	fiber "github.com/gofiber/fiber"
 )
 
-func Report(r *gin.Engine) {
-	r.POST("/report", HandleReport)
+func Report(r *fiber.App) {
+	r.Post("/report", HandleReport)
 }
-
