@@ -1,15 +1,17 @@
 package user
 
 import (
+	"strconv"
+	"time"
+
 	db "github.com/SantiiRepair/biosurf-api/db"
 	"github.com/dgrijalva/jwt-go"
 	fiber "github.com/gofiber/fiber/v2"
 	bcrypt "golang.org/x/crypto/bcrypt"
-	"strconv"
-	"time"
 )
 
 func HandleLogin(c *fiber.Ctx) error {
+	var users User
 	var data LoginData
 	err := c.BodyParser(&data)
 	if err != nil {
@@ -19,9 +21,7 @@ func HandleLogin(c *fiber.Ctx) error {
 		})
 	}
 
-	var users User
-	db.DB.Where("email = ?", users.Email).First(&users)
-
+	db.DB.Where("email = ?", data.Email).First(&users)
 	if users.ID == 0 {
 		c.Status(fiber.StatusNotFound)
 		c.JSON(fiber.Map{
@@ -61,7 +61,7 @@ func HandleLogin(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&cookie)
-	c.Status(fiber.StatusAccepted)
+	//c.Status(fiber.StatusOK)
 	c.JSON(fiber.Map{
 		"message": "success",
 	})

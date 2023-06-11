@@ -25,11 +25,11 @@ func HandleRegister(c *fiber.Ctx) error {
 
 	users := &User{
 		Name:      data.Name,
-		LastName:  data.LastName,
+		Lastname:  data.Lastname,
 		Email:     data.Email,
 		Password:  string(passwordHash),
-		CreatedAt: date,
-		UpdatedAt: date,
+		CreatedAt: date.String(),
+		UpdatedAt: date.String(),
 	}
 
 	db.DB.Create(&users)
