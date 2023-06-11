@@ -11,7 +11,13 @@ import (
 )
 
 func main() {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		Prefork:       true,
+		CaseSensitive: true,
+		StrictRouting: true,
+		ServerHeader:  "Biosurf Server",
+		AppName:       "Biosurf Server v1.0.0",
+	})
 
 	err := db.Connect()
 	if err != nil {

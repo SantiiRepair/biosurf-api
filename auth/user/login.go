@@ -58,6 +58,7 @@ func HandleLogin(c *fiber.Ctx) error {
 		Value:    token,
 		Expires:  time.Now().Add(time.Hour * 24),
 		SameSite: "none",
+		Secure: true,
 		HTTPOnly: true,
 	}
 
