@@ -16,7 +16,7 @@ func HandleLogin(c *fiber.Ctx) error {
 	err := c.BodyParser(&data)
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
-		c.JSON(fiber.Map{
+		return c.JSON(fiber.Map{
 			"message": "Could not login",
 		})
 	}
@@ -24,7 +24,7 @@ func HandleLogin(c *fiber.Ctx) error {
 	db.DB.Where("email = ?", data.Email).First(&users)
 	if users.ID == 0 {
 		c.Status(fiber.StatusNotFound)
-		c.JSON(fiber.Map{
+		return c.JSON(fiber.Map{
 			"message": "Email not found",
 		})
 	}
@@ -32,7 +32,7 @@ func HandleLogin(c *fiber.Ctx) error {
 	hashed := bcrypt.CompareHashAndPassword([]byte(users.Password), []byte(data.Password))
 	if hashed != nil {
 		c.Status(fiber.StatusBadRequest)
-		c.JSON(
+		return c.JSON(
 			fiber.Map{
 				"message": "Incorrect password",
 			},
@@ -48,23 +48,23 @@ func HandleLogin(c *fiber.Ctx) error {
 
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
-		c.JSON(fiber.Map{
+		return c.JSON(fiber.Map{
 			"message": "Could not login",
 		})
 	}
 
 	cookie := fiber.Cookie{
-		Name:     "jwt",
+		Name:     "smsuances_session",
 		Value:    token,
 		Expires:  time.Now().Add(time.Hour * 24),
+		SameSite: "none",
 		HTTPOnly: true,
 	}
 
 	c.Cookie(&cookie)
 	//c.Status(fiber.StatusOK)
-	c.JSON(fiber.Map{
+
+	return c.JSON(fiber.Map{
 		"message": "success",
 	})
-
-	return err
 }
