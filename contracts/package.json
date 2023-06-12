@@ -1,0 +1,20 @@
+{
+  "name": "contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scrips/deploy.js",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "deploy:ethereum": "npx hardhat run --network ethereum scripts/deploy.js",
+    "deploy:sepolia": "npx hardhat run --network sepolia scripts/deploy.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.6",
+    "@openzeppelin/contracts": "^4.8.3",
+    "dotenv": "^16.0.3",
+    "hardhat": "^2.14.0"
+  }
+}
