@@ -6,6 +6,7 @@ import (
 	"github.com/SantiiRepair/biosurf-api/auth/user"
 	"github.com/SantiiRepair/biosurf-api/db"
 	"github.com/SantiiRepair/biosurf-api/report"
+	"github.com/SantiiRepair/biosurf-api/dynamic/mails"
 	fiber "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
@@ -32,7 +33,8 @@ func main() {
 	}))
 
 	user.Auth(app)
-	report.Report(app)
+	mails.EmailNotifier(app)
+	report.Report(app)	
 
 	log.Fatal(app.Listen(":8080"))
 }

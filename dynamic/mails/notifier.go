@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"net/smtp"
 	"os"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-func HandleNotifier(HandleNotifierring) {
+func EmailNotifier(c *fiber.Ctx) {
+	recipient := c.FormValue("recipient")
 	from := os.Getenv("MAIL_ADDRESS")
 	password := os.Getenv("MAIL_PASSWORD")
 
@@ -26,12 +29,4 @@ func HandleNotifier(HandleNotifierring) {
 		fmt.Println(err)
 		return
 	}
-}package mails
-
-import (
-	fiber "github.com/gofiber/fiber/v2"
-)
-
-func EmailNotifier(r *fiber.App) {
-	r.Post("/notifier", HandleReport)
 }
