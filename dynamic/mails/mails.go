@@ -3,14 +3,15 @@ package mails
 import (
 	"fmt"
 	"net/smtp"
+	"os"
 )
 
-func EmailNotifier() {
-	from := "from@gmail.com"
-	password := "<Email Password>"
+func EmailNotifier(recipient string) {
+	from := os.Getenv("MAIL_ADDRESS")
+	password := os.Getenv("MAIL_PASSWORD")
 
 	to := []string{
-		"sender@example.com",
+		recipient,
 	}
 
 	host := "smtp.gmail.com"
