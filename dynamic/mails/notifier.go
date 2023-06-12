@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func EmailNotifier(c *fiber.Ctx) {
+func HandleNotifier(c *fiber.Ctx) error {
 	recipient := c.FormValue("recipient")
 	from := os.Getenv("MAIL_ADDRESS")
 	password := os.Getenv("MAIL_PASSWORD")
@@ -27,6 +27,7 @@ func EmailNotifier(c *fiber.Ctx) {
 	err := smtp.SendMail(host+":"+port, auth, from, to, message)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
+
+	return err
 }
