@@ -5,5 +5,5 @@ import (
 )
 
 func PasswordRecovery(r *fiber.App) {
-	r.Post("/reset", HandlePRS)
+	r.Post("/recovery", HandlePRS)
 }
