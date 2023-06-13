@@ -1,24 +1,15 @@
 package user
 
 import (
-	"time"
-
 	fiber "github.com/gofiber/fiber/v2"
 )
 
-func HandleLogout(c *fiber.Ctx)error {
-	cookie := fiber.Cookie{
-		Name:     "jwt",
-		Value:    "",
-		Expires:  time.Now().Add(-time.Hour),
-		HTTPOnly: true,
-	}
+func HandleLogout(c *fiber.Ctx) error {
 
-	c.Cookie(&cookie)
-
+	c.ClearCookie("smsuances_session")
 	c.JSON(fiber.Map{
 		"message": "success",
 	})
-	
+
 	return nil
 }
