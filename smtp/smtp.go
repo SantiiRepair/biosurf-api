@@ -1,4 +1,4 @@
-package mails
+package smtp
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func HandleNotifier(c *fiber.Ctx) error {
+func HandleSMTP(c *fiber.Ctx) error {
 	recipient := c.FormValue("recipient")
 	from := os.Getenv("MAIL_ADDRESS")
 	password := os.Getenv("MAIL_PASSWORD")

@@ -1,14 +1,15 @@
 package main
 
 import (
+	"log"
+
+	"github.com/SantiiRepair/biosurf-api/auth/prs"
 	"github.com/SantiiRepair/biosurf-api/auth/user"
 	"github.com/SantiiRepair/biosurf-api/db"
-	"github.com/SantiiRepair/biosurf-api/dynamic/mails"
 	"github.com/SantiiRepair/biosurf-api/report"
 	fiber "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
-	"log"
 )
 
 func main() {
@@ -34,9 +35,8 @@ func main() {
 	}))
 
 	user.Auth(app)
-	mails.EmailNotifier(app)
+	prs.PasswordRecovery(app)
 	report.Report(app)
 
 	log.Fatal(app.Listen(":8080"))
 }
-
