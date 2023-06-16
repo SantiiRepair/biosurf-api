@@ -41,8 +41,7 @@ func HandleLogin(c *fiber.Ctx) error {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["email"] = "rickety_cricket@example.com"
-	claims["admin"] = true
+	claims["email"] = data.Email
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	t, err := token.SignedString([]byte("secret"))
