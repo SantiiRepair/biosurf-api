@@ -9,12 +9,21 @@ import (
 )
 
 func HandleRegister(c *fiber.Ctx) error {
+	var peer User
 	var data RegisterData
 	err := c.BodyParser(&data)
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
 		c.JSON(fiber.Map{
 			"message": "Could not register",
+		})
+	}
+
+	db.DB.Where("email = ?", data.Email).First(&peer)
+	if peer.ID > 0 {
+		c.Status(fiber.StatusConflict)
+		return c.JSON(fiber.Map{
+			"message": "Email exists",
 		})
 	}
 
