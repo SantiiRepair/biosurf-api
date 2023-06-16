@@ -1,4 +1,4 @@
-package main
+package smtp
 
 import (
 	"crypto/tls"
@@ -9,15 +9,13 @@ import (
 	"net/smtp"
 	"os"
 
-	"github.com/joho/godotenv"
-	//"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2"
 )
 
-func main() {
-	godotenv.Load()
+func Mailer(c *fiber.Ctx) error{
 	from := mail.Address{Name: "", Address: os.Getenv("MAIL_ADDRESS")}
 	password := os.Getenv("MAIL_PASSWORD")
-	to := mail.Address{Name: "", Address: "miguelsantiago1940@gmail.com"}
+	to := mail.Address{Name: "", Address: c.FormValue("email")}
 
 	subj := "This is the email subject"
 	body := "This is an example body.\n With two lines."
@@ -51,24 +49,24 @@ func main() {
 		log.Panic(err)
 	}
 
-	c, err := smtp.NewClient(conn, host)
+	s, err := smtp.NewClient(conn, host)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	if err = c.Auth(auth); err != nil {
+	if err = s.Auth(auth); err != nil {
 		log.Panic(err)
 	}
 
-	if err = c.Mail(from.Address); err != nil {
+	if err = s.Mail(from.Address); err != nil {
 		log.Panic(err)
 	}
 
-	if err = c.Rcpt(to.Address); err != nil {
+	if err = s.Rcpt(to.Address); err != nil {
 		log.Panic(err)
 	}
 
-	w, err := c.Data()
+	w, err := s.Data()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -83,7 +81,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	c.Quit()
+	s.Quit()
 
-	//return err
+	return err
 }
