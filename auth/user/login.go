@@ -1,7 +1,6 @@
 package user
 
 import (
-	"strconv"
 	"time"
 
 	db "github.com/SantiiRepair/biosurf-api/db"
@@ -39,13 +38,14 @@ func HandleLogin(c *fiber.Ctx) error {
 		)
 	}
 
-	clams := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(users.ID)),
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-	})
+	token := jwt.New(jwt.SigningMethodHS256)
 
-	token, err := clams.SignedString([]byte(SecretKey))
+	claims := token.Claims.(jwt.MapClaims)
+	claims["email"] = "rickety_cricket@example.com"
+	claims["admin"] = true
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
+	t, err := token.SignedString([]byte("secret"))
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
@@ -53,18 +53,8 @@ func HandleLogin(c *fiber.Ctx) error {
 		})
 	}
 
-	cookie := fiber.Cookie{
-		Name:     "smsuances_session",
-		Value:    token,
-		Expires:  time.Now().Add(time.Hour * 24),
-		SameSite: "none",
-		Secure: true,
-		HTTPOnly: true,
-	}
-
-	c.Cookie(&cookie)
-
+	c.Status(fiber.StatusOK)
 	return c.JSON(fiber.Map{
-		"message": "success",
+		"token": t,
 	})
 }
