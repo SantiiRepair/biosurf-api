@@ -7,13 +7,13 @@ import (
 	"google.golang.org/api/oauth2/v2"
 )
 
-func HandleGoogle(c *fiber.Ctx) (*oauth2.Tokeninfo, error) {
+func HandleGoogle(c *fiber.Ctx) error {
 	idToken := c.FormValue("googleToken")
 	oauth2Service, err := oauth2.New(&http.Client{})
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
-		return nil, c.JSON(fiber.Map{
-			"message": "Could not login",
+		return c.JSON(fiber.Map{
+			"message": "Could not auth",
 		})
 	}
 
@@ -22,13 +22,13 @@ func HandleGoogle(c *fiber.Ctx) (*oauth2.Tokeninfo, error) {
 	decode, err := tokenInfoCall.Do()
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
-		return nil, c.JSON(fiber.Map{
-			"message": "Could not a",
+		return c.JSON(fiber.Map{
+			"message": "Could not auth",
 		})
 	}
 
 	c.Status(fiber.StatusOK)
-	return nil, c.JSON(fiber.Map{
+	return c.JSON(fiber.Map{
 		"message": decode,
 	})
 }
