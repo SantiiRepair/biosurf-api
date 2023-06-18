@@ -23,3 +23,8 @@ type RegisterData struct {
 	Password string `json:"password"`
 	Ipv4     string `json:"ipv4"`
 }
+
+type GoogleData struct {
+	AccessToken string `json:"googleToken"`
+	Action      string `json:"action"`
+}
