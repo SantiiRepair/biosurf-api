@@ -36,7 +36,7 @@ func getTokenInfo(accessToken string) (*oauth2.Tokeninfo, error) {
 
 	buf := json.Unmarshal(buffer[:n], &creds)
 	if buf != nil {
-		return nil, err
+		return nil, buf
 	}
 
 	credsJSON, err := json.Marshal(creds)
