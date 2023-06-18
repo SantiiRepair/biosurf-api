@@ -2,7 +2,9 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"google.golang.org/api/oauth2/v2"
 	"google.golang.org/api/option"
@@ -12,12 +14,42 @@ import (
 
 func getTokenInfo(accessToken string) (*oauth2.Tokeninfo, error) {
 	ctx := context.Background()
-	svc, err := oauth2.NewService(ctx, option.WithCredentialsFile("./config/credentials.json"))
+	file, err := os.Open("./config/credentials.json")
 	if err != nil {
 		return nil, err
 	}
 
-	tokenInfo, err := svc.Tokeninfo().AccessToken(accessToken).Do()
+	defer file.Close()
+	buffer := make([]byte, 1024)
+	n, err := file.Read(buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	var creds struct {
+		Web struct {
+			ClientID     string `json:"client_id"`
+			ClientSecret string `json:"client_secret"`
+			RedirectURL  string `json:"redirect_uris"`
+		} `json:"web"`
+	}
+
+	buf := json.Unmarshal(buffer[:n], &creds)
+	if buf != nil {
+		return nil, err
+	}
+
+	credsJSON, err := json.Marshal(creds)
+	if err != nil {
+		return nil, err
+	}
+
+	oauth2Service, err := oauth2.NewService(ctx, option.WithCredentialsJSON(credsJSON))
+	if err != nil {
+		return nil, err
+	}
+
+	tokenInfo, err := oauth2Service.Tokeninfo().AccessToken(accessToken).Do()
 	if err != nil {
 		return nil, err
 	}
