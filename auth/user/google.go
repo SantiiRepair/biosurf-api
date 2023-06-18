@@ -1,65 +1,29 @@
 package user
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 
-	"google.golang.org/api/oauth2/v2"
-	"google.golang.org/api/option"
-
+	"github.com/dgrijalva/jwt-go"
 	fiber "github.com/gofiber/fiber/v2"
 )
 
-func getTokenInfo(accessToken string) (*oauth2.Tokeninfo, error) {
-	ctx := context.Background()
-	file, err := os.Open("./config/credentials.json")
-	if err != nil {
-		return nil, err
-	}
+func getTokenInfo(token *jwt.Token) jwt.MapClaims {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok && token.Valid {
+		sub := claims["sub"].(string)
+		name := claims["name"].(string)
+		iat := claims["iat"].(float64)
 
-	defer file.Close()
-	buffer := make([]byte, 1024)
-	n, err := file.Read(buffer)
-	if err != nil {
-		return nil, err
+		fmt.Printf("sub: %s, name: %s, iat: %.0f\n", sub, name, iat)
 	}
-
-	var creds struct {
-		Web struct {
-			ClientID     string `json:"client_id"`
-			ClientSecret string `json:"client_secret"`
-			RedirectURL  string `json:"redirect_uris"`
-		} `json:"web"`
-	}
-
-	buf := json.Unmarshal(buffer[:n], &creds)
-	if buf != nil {
-		return nil, buf
-	}
-
-	credsJSON, err := json.Marshal(creds)
-	if err != nil {
-		return nil, err
-	}
-
-	oauth2Service, err := oauth2.NewService(ctx, option.WithCredentialsJSON(credsJSON))
-	if err != nil {
-		return nil, err
-	}
-
-	tokenInfo, err := oauth2Service.Tokeninfo().AccessToken(accessToken).Do()
-	if err != nil {
-		return nil, err
-	}
-
-	return tokenInfo, nil
+	return claims
 }
 
 func HandleGoogle(c *fiber.Ctx) error {
 	var oauth2 GoogleData
 	err := c.BodyParser(&oauth2)
+	secret := []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
@@ -67,17 +31,20 @@ func HandleGoogle(c *fiber.Ctx) error {
 		})
 	}
 
-	if len(oauth2.AccessToken) == 0 {
-		c.Status(fiber.StatusUnauthorized)
-		return c.JSON(fiber.Map{
-			"message":      "Invalid access token",
-			"access_token": oauth2.AccessToken,
-		})
-	}
+	token, err := jwt.Parse(oauth2.JWTDataUser, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			c.Status(fiber.StatusUnauthorized)
+			return c.JSON(fiber.Map{
+				"message":      "Invalid access token",
+				"access_token": oauth2.JWTDataUser,
+			}), err
+		}
+		return secret, err
+	})
 
-	o, err := getTokenInfo(oauth2.AccessToken)
-	fmt.Println(o, err)
-	if err != nil {
+	o := getTokenInfo(token)
+	fmt.Println(o)
+	if o == nil {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
 			"message": "Could not verify token",

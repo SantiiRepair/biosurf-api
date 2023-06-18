@@ -25,6 +25,6 @@ type RegisterData struct {
 }
 
 type GoogleData struct {
-	AccessToken string `json:"googleToken"`
+	JWTDataUser string `json:"googleToken"`
 	Action      string `json:"action"`
 }
