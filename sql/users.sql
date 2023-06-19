@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 12-06-2023 a las 23:10:35
+-- Tiempo de generación: 19-06-2023 a las 09:33:44
 -- Versión del servidor: 8.0.33
 -- Versión de PHP: 7.4.3-4ubuntu2.18
 
@@ -43,6 +43,10 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
+-- Índices para tablas volcadas
+--
+
+--
 -- Indices de la tabla `users`
 --
 ALTER TABLE `users`
@@ -56,7 +60,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
