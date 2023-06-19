@@ -104,12 +104,12 @@ func HandleGoogle(c *fiber.Ctx) error {
 		}
 
 		people := &User{
-			Name:      given_name,
-			Lastname:  family_name,
-			Email:     email,
-			GoogleID:  sub,
-			CreatedAt: date.String(),
-			UpdatedAt: date.String(),
+			Name:          given_name,
+			Lastname:      family_name,
+			GoogleAccount: email,
+			GoogleID:      sub,
+			CreatedAt:     date.String(),
+			UpdatedAt:     date.String(),
 		}
 
 		db.DB.Create(&people)
