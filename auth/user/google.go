@@ -103,7 +103,7 @@ func HandleGoogle(c *fiber.Ctx) error {
 			})
 		}
 
-		users := &User{
+		people := &User{
 			Name:      name,
 			Lastname:  family_name,
 			Email:     email,
@@ -112,7 +112,7 @@ func HandleGoogle(c *fiber.Ctx) error {
 			UpdatedAt: date.String(),
 		}
 
-		db.DB.Create(&users)
+		db.DB.Create(&people)
 		c.Status(fiber.StatusOK)
 		return c.JSON(fiber.Map{
 			"message": "Register successful",
