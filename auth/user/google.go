@@ -53,7 +53,7 @@ func HandleGoogle(c *fiber.Ctx) error {
 		email := claims["email"].(string)
 		sub := claims["sub"].(string)
 
-		db.DB.Where("email = ?", email).First(&users)
+		db.DB.Where("google_account = ?", email).First(&users)
 		if len(users.GoogleAccount) == 0 {
 			c.Status(fiber.StatusNotFound)
 			return c.JSON(fiber.Map{
@@ -95,7 +95,7 @@ func HandleGoogle(c *fiber.Ctx) error {
 		family_name := claims["family_name"].(string)
 		sub := claims["sub"].(string)
 
-		db.DB.Where("email = ?", email).First(&users)
+		db.DB.Where("google_account = ?", email).First(&users)
 		if len(users.GoogleAccount) > 0 {
 			c.Status(fiber.StatusConflict)
 			return c.JSON(fiber.Map{
