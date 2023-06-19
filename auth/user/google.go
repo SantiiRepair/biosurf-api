@@ -62,7 +62,7 @@ func HandleGoogle(c *fiber.Ctx) error {
 		}
 
 		if users.GoogleID != sub {
-			c.Status(fiber.StatusNotFound)
+			c.Status(fiber.StatusUnauthorized)
 			return c.JSON(fiber.Map{
 				"message": "Illegal authentication",
 			})
