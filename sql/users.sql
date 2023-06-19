@@ -35,6 +35,8 @@ CREATE TABLE `users` (
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `google_auth` varchar(255) DEFAULT NULL,
   `facebook_auth` varchar(255) DEFAULT NULL,
+  `google_id` varchar(255) DEFAULT NULL,
+  `facebook_id` varchar(255) DEFAULT NULL,
   `created_at` varchar(255) DEFAULT NULL,
   `updated_at` varchar(255) DEFAULT NULL,
   `ipv4` varchar(255) DEFAULT NULL

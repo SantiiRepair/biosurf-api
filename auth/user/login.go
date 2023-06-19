@@ -1,6 +1,7 @@
 package user
 
 import (
+	"os"
 	"time"
 
 	db "github.com/SantiiRepair/biosurf-api/db"
@@ -13,6 +14,7 @@ func HandleLogin(c *fiber.Ctx) error {
 	var users User
 	var data LoginData
 	err := c.BodyParser(&data)
+	secret := []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
@@ -44,7 +46,7 @@ func HandleLogin(c *fiber.Ctx) error {
 	claims["email"] = data.Email
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
-	t, err := token.SignedString([]byte("secret"))
+	t, err := token.SignedString(secret)
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
@@ -54,6 +56,7 @@ func HandleLogin(c *fiber.Ctx) error {
 
 	c.Status(fiber.StatusOK)
 	return c.JSON(fiber.Map{
-		"token": t,
+		"message": "Login successful",
+		"session": t,
 	})
 }
