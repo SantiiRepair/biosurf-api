@@ -91,7 +91,7 @@ func HandleGoogle(c *fiber.Ctx) error {
 
 	if oauth2.Action == "register" {
 		email := claims["email"].(string)
-		name := claims["name"].(string)
+		given_name := claims["given_name"].(string)
 		family_name := claims["family_name"].(string)
 		sub := claims["sub"].(string)
 
@@ -104,7 +104,7 @@ func HandleGoogle(c *fiber.Ctx) error {
 		}
 
 		people := &User{
-			Name:      name,
+			Name:      given_name,
 			Lastname:  family_name,
 			Email:     email,
 			GoogleID:  sub,
