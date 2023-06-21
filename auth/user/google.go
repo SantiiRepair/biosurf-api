@@ -71,7 +71,7 @@ func HandleGoogle(c *fiber.Ctx) error {
 		token := jwt.New(jwt.SigningMethodHS256)
 
 		claims := token.Claims.(jwt.MapClaims)
-		claims["email"] = email
+		claims["id"] = users.ID
 		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 		t, err := token.SignedString(secret)
@@ -106,6 +106,7 @@ func HandleGoogle(c *fiber.Ctx) error {
 		people := &User{
 			Name:          given_name,
 			Lastname:      family_name,
+			Email:         email,
 			GoogleAccount: email,
 			GoogleID:      sub,
 			CreatedAt:     date.String(),
