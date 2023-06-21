@@ -36,8 +36,8 @@ func HandleInfo(c *fiber.Ctx) error {
 	})
 
 	claims := fun.Claims.(jwt.MapClaims)
-	id := claims["id"].(string)
-	if len(id) == 0 {
+	id := claims["id"].(float64)
+	if id == 0 {
 		return fiber.NewError(fiber.StatusBadRequest, "Empty token data")
 	}
 
