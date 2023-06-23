@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -9,38 +9,32 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract SMSUANCESERC721 is ERC721, ERC721Burnable, ERC721Pausable, ERC721URIStorage, AccessControl {
-    using Counters for Counters.Counter;
+contract SMSUANCES is
+    ERC721,
+    ERC721Burnable,
+    ERC721Pausable,
+    ERC721URIStorage,
+    AccessControl
+{
+    address private _admin;
+    address private _next;
+    uint256 public constant TRANSFER_LOCK_TIME = 5 * 365 days;
 
-    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    mapping(uint256 => uint256) private _tokenLock;
 
-    Counters.Counter private _tokenIdCounter;
-
-    mapping(uint256 => bool) private _tokenIsTransferable;
-
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(PAUSER_ROLE, msg.sender);
-        _setupRole(MINTER_ROLE, msg.sender);
+    constructor(
+        string memory name,
+        string memory symbol,
+        address admin,
+        address next
+    ) ERC721(name, symbol) {
+        _admin = admin;
+        _next = next;
     }
 
-    function pause() public {
-        require(hasRole(PAUSER_ROLE, msg.sender));
-        _pause();
-    }
-
-    function unpause() public {
-        require(hasRole(PAUSER_ROLE, msg.sender));
-        _unpause();
-    }
-
-    function mint(address to, string memory tokenURI) public {
-        require(hasRole(MINTER_ROLE, msg.sender));
-        _tokenIdCounter.increment();
-        uint256 newTokenId = _tokenIdCounter.current();
-        _mint(to, newTokenId);
-        _setTokenURI(newTokenId, tokenURI);
+    modifier onlyAdmin() {
+        require(msg.sender == _admin, "SMSUANCES: caller is not the admin");
+        _;
     }
 
     function ownerOf(uint256 tokenId) public view override returns (address) {
@@ -48,71 +42,112 @@ contract SMSUANCESERC721 is ERC721, ERC721Burnable, ERC721Pausable, ERC721URISto
     }
 
     function tokenIsTransferable(uint256 tokenId) public view returns (bool) {
-        return _tokenIsTransferable[tokenId];
+        return
+            this.tokenIsTransferable(tokenId) &&
+            (block.timestamp >= _tokenLock[tokenId]);
     }
 
     function contractName() public pure returns (string memory) {
-        return "BiosurfERC721";
+        return "SMSUANCES";
     }
 
     function contractSymbol() public pure returns (string memory) {
-        return "BSF";
+        return "SMS";
     }
-
-    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
     mapping(address => bool) public authorized;
 
-    function authorize(address user, address contractAddress) public onlyOwner {
+    function authorize(address user, address contractAddress) public onlyAdmin {
         authorized[contractAddress] = true;
     }
 
-    function revokeAuthorization(address contractAddress) public onlyOwner {
+    function revokeAuthorization(address contractAddress) public onlyAdmin {
         authorized[contractAddress] = false;
     }
 
-    function createNewToken(address to, bool transferable) public onlyOwner returns (uint256) {
-        _tokenIdCounter.increment();
-        uint256 newTokenId = _tokenIdCounter.current();
-        _mint(to, newTokenId);
-        _tokenIsTransferable[newTokenId] = transferable;
+    function createNewToken(address to) public onlyAdmin returns (uint256) {
+        uint256 newTokenId = createNewToken(_next);
+        _tokenLock[newTokenId] = block.timestamp + TRANSFER_LOCK_TIME;
         return newTokenId;
     }
 
-    function burn(uint256 tokenId) public onlyOwner {
-        _burn(tokenId);
+    function burn(uint256 tokenId) public override onlyAdmin {
+        super.burn(tokenId);
+        _tokenLock[tokenId] = 0;
     }
 
-    function setTokenTransferability(uint256 tokenId, bool transferable) public onlyOwner {
-        _tokenIsTransferable[tokenId] = transferable;
+    function setTokenTransferability(
+        uint256 tokenId,
+        bool transferable
+    ) public onlyAdmin {
+        require(
+            block.timestamp >= _tokenLock[tokenId],
+            "SMSUANCES: token is locked for transfer"
+        );
+
+        this.setTokenTransferability(tokenId, transferable);
     }
 
-    function isApprovedForAll(address owner, address operator) public view override returns (bool) {
+    function isApprovedForAll(
+        address owner,
+        address operator
+    ) public view override returns (bool) {
         if (authorized[operator]) {
             return true;
         }
         return super.isApprovedForAll(owner, operator);
     }
 
-    function transferFrom(address from, address to, uint256 tokenId) public override {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
-        require(_tokenIsTransferable[tokenId], "ERC721: token is not transferable");
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override {
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "ERC721: transfer caller is not owner nor approved"
+        );
+        require(
+            this.tokenIsTransferable(tokenId),
+            "ERC721: token is not transferable"
+        );
 
-        _transfer(from, to, tokenId);
+        super.transferFrom(from, to, tokenId);
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) public override {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
-        require(_tokenIsTransferable[tokenId], "ERC721: token is not transferable");
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override {
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "ERC721: transfer caller is not owner nor approved"
+        );
+        require(
+            this.tokenIsTransferable(tokenId),
+            "ERC721: token is not transferable"
+        );
 
-        _safeTransfer(from, to, tokenId, _data);
+        super.safeTransferFrom(from, to, tokenId);
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) public override {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfercaller is not owner nor approved");
-        require(_tokenIsTransferable[tokenId], "ERC721: token is not transferable");
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory _data
+    ) public virtual override {
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "ERC721: transfer caller is not owner nor approved"
+        );
+        require(
+            this.tokenIsTransferable(tokenId),
+            "ERC721: token is not transferable"
+        );
 
-        _safeTransfer(from, to, tokenId, "");
+        super.safeTransferFrom(from, to, tokenId, _data);
     }
 
     function _approve(address to, uint256 tokenId) internal override {
