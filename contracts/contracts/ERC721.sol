@@ -43,9 +43,6 @@ contract SMSUANCESERC721 is ERC721, ERC721Burnable, ERC721Pausable, ERC721URISto
         _setTokenURI(newTokenId, tokenURI);
     }
 
-    // Nuevas funciones
-
-    // Funciones de consulta de token
     function ownerOf(uint256 tokenId) public view override returns (address) {
         return super.ownerOf(tokenId);
     }
@@ -54,7 +51,6 @@ contract SMSUANCESERC721 is ERC721, ERC721Burnable, ERC721Pausable, ERC721URISto
         return _tokenIsTransferable[tokenId];
     }
 
-    // Funciones de consulta de contrato
     function contractName() public pure returns (string memory) {
         return "BiosurfERC721";
     }
@@ -63,10 +59,8 @@ contract SMSUANCESERC721 is ERC721, ERC721Burnable, ERC721Pausable, ERC721URISto
         return "BSF";
     }
 
-    // Eventos
     event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
-    // Funciones de control de acceso
     mapping(address => bool) public authorized;
 
     function authorize(address user, address contractAddress) public onlyOwner {
@@ -77,7 +71,6 @@ contract SMSUANCESERC721 is ERC721, ERC721Burnable, ERC721Pausable, ERC721URISto
         authorized[contractAddress] = false;
     }
 
-    // Funciones de gestión de tokens
     function createNewToken(address to, bool transferable) public onlyOwner returns (uint256) {
         _tokenIdCounter.increment();
         uint256 newTokenId = _tokenIdCounter.current();
@@ -94,7 +87,6 @@ contract SMSUANCESERC721 is ERC721, ERC721Burnable, ERC721Pausable, ERC721URISto
         _tokenIsTransferable[tokenId] = transferable;
     }
 
-    // Overrides
     function isApprovedForAll(address owner, address operator) public view override returns (bool) {
         if (authorized[operator]) {
             return true;
