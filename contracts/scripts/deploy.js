@@ -7,9 +7,9 @@ async function main() {
   console.log(`Deploying contracts with the account: ${deployer.address}`);
 
   const ERC721Proxy = await ethers.getContractFactory("ERC721Proxy");
-  const biosurfContract = await ERC721Proxy.deploy(process.env.URI);
+  const smsuances = await ERC721Proxy.deploy(process.env.URI);
 
-  console.log(`Biosurf contract deployed at address: ${biosurfContract.address}`);
+  console.log(`7msuances contract deployed at address: ${smsuances.address} `);
 }
 
 main()

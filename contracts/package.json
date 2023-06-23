@@ -5,8 +5,8 @@
   "main": "scrips/deploy.js",
   "scripts": {
     "compile": "npx hardhat compile",
-    "deploy:ethereum": "npx hardhat run --network ethereum scripts/deploy.js",
-    "deploy:sepolia": "npx hardhat run --network sepolia scripts/deploy.js"
+    "deploy:polygon": "npx hardhat run --network polygon scripts/deploy.js",
+    "deploy:mumbai": "npx hardhat run --network mumbai scripts/deploy.js"
   },
   "author": "",
   "license": "ISC",
