@@ -142,4 +142,3 @@ contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage {
         return super.tokenURI(tokenId);
     }
 }
--

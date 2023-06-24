@@ -12,7 +12,7 @@ contract ProxyProtocol {
     constructor() {
         _admin = msg.sender;
     }
--
+
     function implementation() public returns (address) {
         require(
             !_userCreatedContract[msg.sender],
