@@ -9,13 +9,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract SMSUANCES is
-    ERC721,
-    ERC721Burnable,
-    ERC721Pausable,
-    ERC721URIStorage,
-    AccessControl
-{
+contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage, AccessControl {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
     address private _admin;
     address private _next;
     uint256 public constant TRANSFER_LOCK_TIME = 5 * 365 days;
@@ -57,7 +53,7 @@ contract SMSUANCES is
 
     mapping(address => bool) public authorized;
 
-    function authorize(address user, address contractAddress) public onlyAdmin {
+    function authorize(address contractAddress) public onlyAdmin {
         authorized[contractAddress] = true;
     }
 
@@ -65,14 +61,18 @@ contract SMSUANCES is
         authorized[contractAddress] = false;
     }
 
-    function createNewToken(address to) public onlyAdmin returns (uint256) {
-        uint256 newTokenId = createNewToken(_next);
+    function createNewToken() public returns (uint256) {
+        uint256 newTokenId = _tokenIds.current();
+        _mint(_next, newTokenId);
         _tokenLock[newTokenId] = block.timestamp + TRANSFER_LOCK_TIME;
+        _tokenIds.increment();
         return newTokenId;
     }
 
-    function burn(uint256 tokenId) public override onlyAdmin {
-        super.burn(tokenId);
+    function _burn(
+        uint256 tokenId
+    ) internal virtual override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
         _tokenLock[tokenId] = 0;
     }
 
@@ -118,23 +118,6 @@ contract SMSUANCES is
     function safeTransferFrom(
         address from,
         address to,
-        uint256 tokenId
-    ) public virtual override {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "ERC721: transfer caller is not owner nor approved"
-        );
-        require(
-            this.tokenIsTransferable(tokenId),
-            "ERC721: token is not transferable"
-        );
-
-        super.safeTransferFrom(from, to, tokenId);
-    }
-
-    function safeTransferFrom(
-        address from,
-        address to,
         uint256 tokenId,
         bytes memory _data
     ) public virtual override {
@@ -152,6 +135,18 @@ contract SMSUANCES is
 
     function _approve(address to, uint256 tokenId) internal override {
         super._approve(to, tokenId);
-        emit ApprovalForAll(ownerOf(tokenId), to, true);
+        emit Approval(_next, to, tokenId);
+    }
+
+    function tokenURI(
+        uint256 tokenId
+    )
+        public
+        view
+        virtual
+        override(ERC721, ERC721URIStorage)
+        returns (string memory)
+    {
+        return super.tokenURI(tokenId);
     }
 }
