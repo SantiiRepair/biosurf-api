@@ -31,7 +31,12 @@ contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage {
         _;
     }
 
-    function ownerOf(uint256 tokenId) public view override returns (address) {
+    function ownerOf(uint256 tokenId)
+        public
+        view
+        override(ERC721, IERC721)
+        returns (address)
+    {
         return super.ownerOf(tokenId);
     }
 
@@ -56,17 +61,19 @@ contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage {
         return newTokenId;
     }
 
-    function _burn(
-        uint256 tokenId
-    ) internal virtual override(ERC721, ERC721URIStorage) {
+    function _burn(uint256 tokenId)
+        internal
+        virtual
+        override(ERC721, ERC721URIStorage)
+    {
         super._burn(tokenId);
         _tokenLock[tokenId] = 0;
     }
 
-    function setTokenTransferability(
-        uint256 tokenId,
-        bool transferable
-    ) public onlyAdmin {
+    function setTokenTransferability(uint256 tokenId, bool transferable)
+        public
+        onlyAdmin
+    {
         require(
             block.timestamp >= _tokenLock[tokenId],
             "SMSUANCES: token is locked for transfer"
@@ -79,7 +86,7 @@ contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage {
         address from,
         address to,
         uint256 tokenId
-    ) public override {
+    ) public override(ERC721, IERC721) {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
@@ -97,7 +104,7 @@ contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage {
         address to,
         uint256 tokenId,
         bytes memory _data
-    ) public virtual override {
+    ) public virtual override(ERC721, IERC721) {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
@@ -115,9 +122,17 @@ contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage {
         emit Approval(_next, to, tokenId);
     }
 
-    function tokenURI(
-        uint256 tokenId
-    )
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721, ERC721URIStorage)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+
+    function tokenURI(uint256 tokenId)
         public
         view
         virtual
@@ -127,3 +142,4 @@ contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage {
         return super.tokenURI(tokenId);
     }
 }
+-
