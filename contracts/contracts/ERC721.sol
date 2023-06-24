@@ -4,12 +4,10 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage, AccessControl {
+contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     address private _admin;
@@ -43,28 +41,17 @@ contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage, AccessControl {
             (block.timestamp >= _tokenLock[tokenId]);
     }
 
-    function contractName() public pure returns (string memory) {
-        return "SMSUANCES";
-    }
-
-    function contractSymbol() public pure returns (string memory) {
-        return "SMS";
-    }
-
-    mapping(address => bool) public authorized;
-
-    function authorize(address contractAddress) public onlyAdmin {
-        authorized[contractAddress] = true;
-    }
-
-    function revokeAuthorization(address contractAddress) public onlyAdmin {
-        authorized[contractAddress] = false;
-    }
-
-    function createNewToken() public returns (uint256) {
+    function waterdog() public returns (uint256) {
         uint256 newTokenId = _tokenIds.current();
         _mint(_next, newTokenId);
         _tokenLock[newTokenId] = block.timestamp + TRANSFER_LOCK_TIME;
+        _tokenIds.increment();
+        return newTokenId;
+    }
+
+    function custom(address to) public returns (uint256) {
+        uint256 newTokenId = _tokenIds.current();
+        _mint(to, newTokenId);
         _tokenIds.increment();
         return newTokenId;
     }
@@ -86,16 +73,6 @@ contract SMSUANCES is ERC721, ERC721Burnable, ERC721URIStorage, AccessControl {
         );
 
         this.setTokenTransferability(tokenId, transferable);
-    }
-
-    function isApprovedForAll(
-        address owner,
-        address operator
-    ) public view override returns (bool) {
-        if (authorized[operator]) {
-            return true;
-        }
-        return super.isApprovedForAll(owner, operator);
     }
 
     function transferFrom(
